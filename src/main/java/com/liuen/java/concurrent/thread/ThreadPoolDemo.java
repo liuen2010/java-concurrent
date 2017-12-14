@@ -1,4 +1,4 @@
-package com.liuen.java.multhread;
+package com.liuen.java.concurrent.thread;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -51,7 +51,7 @@ import java.util.concurrent.ScheduledExecutorService;
  * @author liuen
  *
  */
-public class ThreadPool {
+public class ThreadPoolDemo {
 
 	public static void main(String[] args) {
 		int cpuCount = Runtime.getRuntime().availableProcessors();

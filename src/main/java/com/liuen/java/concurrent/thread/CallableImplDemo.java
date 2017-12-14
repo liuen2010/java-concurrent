@@ -1,6 +1,5 @@
-package com.liuen.java.multhread;
+package com.liuen.java.concurrent.thread;
 
-import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
@@ -8,6 +7,8 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
+
+import com.liuen.java.util.RandomUtil;
 
 /**
  * 
@@ -19,35 +20,36 @@ import java.util.concurrent.FutureTask;
  * @author liuen
  *
  */
-public class ImplCallable{
+public class CallableImplDemo{
 
 	public static void main(String[] args) throws Exception {
-		Callable<Integer> callable = ImplCallable.createThread();
-		
-		// 使用call方法执行线程
-//		Object call = callable.call();
-//		System.out.println(call);
-		
-		// FutureTask实现了Runnable、Future两个接口，所以它既可以作为Runnable被执行，也可以作为Future获取执行线程的结果
-		FutureTask<Integer> futureTask = new FutureTask<>(callable);
-//		futureTask.run();
+	}
+	
+	public void testFuture() throws Exception {
+		// FutureTask实现了Runnable、Future两个接口，所以它既可以Runnable被执行，也可以作为Future获取执行线程的结果
+		FutureTask<Integer> futureTask = new FutureTask<>(CallableImplDemo.createCallable());
+
 		// 通过FutureTask启动线程
 		new Thread(futureTask).start();
-		new Thread(futureTask).start();
-		new Thread(futureTask).start();
-		new Thread(futureTask).start();
+		
+		Thread.sleep(1000);
+		System.out.println("futureTask-future：" + futureTask.get());
+
 	}
 	
 	/**
-	 * 创建实现Callable接口的新线程
+	 * 创建Callable实例对象
 	 * @return
 	 */
-	public static Callable<Integer> createThread() {
+	public static Callable<Integer> createCallable() {
 		Callable<Integer> callable = () -> {
-			System.out.println("创建新线程：" + Thread.currentThread().getName());
+			String tdName = Thread.currentThread().getName();
+			System.out.println(tdName + "线程call方法开始执行，开始作业" );
 			System.out.println("do something...");
-			Thread.sleep(1000);
-			return new Random().nextInt(100);
+			Thread.sleep(RandomUtil.generateRandomNum(10)*100);
+			System.out.println(tdName + "线程执行完毕，结束作业" );
+			System.out.println("-----------------------------------------------------------");
+			return RandomUtil.generateRandomNum(100);
 		};
 		return callable;
 	}
