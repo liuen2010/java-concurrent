@@ -31,54 +31,52 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class LockInterruptiblyDemo {
 	private static ArrayList<String> arrayList = new ArrayList<String>();// 存放两个线程内总共循环的次数
-	public static ReentrantLock reentrantLock = new ReentrantLock();// 公共锁
+	public static ReentrantLock lock = new ReentrantLock();// 公共锁
 	
+	public static Runnable createRunnable() {
+		return () -> {
+	        try {
+	            insert(Thread.currentThread());
+	        } catch (Exception e) {
+	            System.out.println(Thread.currentThread().getName()+"被中断");
+	        }
+		};
+	}
+	
+	public static void insert(Thread thread) throws InterruptedException {
+        lock.lockInterruptibly();   //注意，如果需要正确中断等待锁的线程，必须将获取锁放在外面，然后将InterruptedException抛出
+        try {  
+            System.out.println(thread.getName()+"得到了锁");
+            long startTime = System.currentTimeMillis();
+            for(    ;     ;) {
+                if(System.currentTimeMillis() - startTime >= Integer.MAX_VALUE)
+                    break;
+                //插入数据
+            }
+        }
+        finally {
+            System.out.println(Thread.currentThread().getName()+"执行finally");
+            lock.unlock();
+            System.out.println(thread.getName()+"释放了锁");
+        }  
+	}
+	
+	/**
+	 * 现象：如果thread-0得到了锁，阻塞。。。thread-1尝试获取锁，如果拿不到，则可以被中断等待
+	 * @param args
+	 */
 	public static void main(String[] args) {
-		new Thread(() -> {
-			String thName = Thread.currentThread().getName();
-			for (int i = 0; i < 100000; i++) {
-				boolean isTrue = reentrantLock.tryLock();//上锁
-				if (isTrue) {
-					try {
-						System.out.println(thName + "线程上锁成功，开始作业");
-						System.out.println(thName + " running ... " + i);
-						arrayList.add(thName + i);
-//					Thread.sleep(RandomUtil.generateRandomNum(10)*100);
-						System.out.println(thName + "线程作业完毕，准备释放锁");
-						System.out.println("-----------------------------------------------------------");
-					} catch (Exception e) {
-						e.printStackTrace();
-					} finally {
-						reentrantLock.unlock();//释放锁
-					}
-				}
-			}
-			System.out.println(thName + "：" + arrayList.size());
-			System.out.println("-----------------------------------------------------------");
-		}).start();
-		
-		new Thread(() -> {
-			String thName = Thread.currentThread().getName();
-			for (int i = 0; i < 100000; i++) {
-				boolean isTrue = reentrantLock.tryLock();//上锁
-				if (isTrue) {
-					try {
-						System.out.println(thName + "线程上锁成功，开始作业");
-						System.out.println(thName + " running ... " + i);
-						arrayList.add(thName + i);
-//					Thread.sleep(RandomUtil.generateRandomNum(10)*100);
-						System.out.println(thName + "线程作业完毕，准备释放锁");
-						System.out.println("-----------------------------------------------------------");
-					} catch (Exception e) {
-						e.printStackTrace();
-					} finally {
-						reentrantLock.unlock();//释放锁
-					}
-				}
-			}
-			System.out.println(thName + "：" + arrayList.size());
-			System.out.println("-----------------------------------------------------------");
-		}).start();
+		Thread thread0 = new Thread(createRunnable());
+		Thread thread1 = new Thread(createRunnable());
+		thread0.start();
+		thread1.start();
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        thread1.interrupt();
+        System.out.println("=====================");
 	}
 	
 }
