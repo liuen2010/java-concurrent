@@ -42,7 +42,7 @@ public class CallableImplDemo{
 	 * @return
 	 */
 	public static Callable<Integer> createCallable() {
-		Callable<Integer> callable = () -> {
+		return () -> {
 			String tdName = Thread.currentThread().getName();
 			System.out.println(tdName + "线程call方法开始执行，开始作业" );
 			System.out.println("do something...");
@@ -51,7 +51,6 @@ public class CallableImplDemo{
 			System.out.println("-----------------------------------------------------------");
 			return RandomUtil.generateRandomNum(100);
 		};
-		return callable;
 	}
 	
 	public static void someThing() {
