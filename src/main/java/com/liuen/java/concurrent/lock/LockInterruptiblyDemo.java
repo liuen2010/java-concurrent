@@ -1,6 +1,5 @@
 package com.liuen.java.concurrent.lock;
 
-import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -30,7 +29,6 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  */
 public class LockInterruptiblyDemo {
-	private static ArrayList<String> arrayList = new ArrayList<String>();// 存放两个线程内总共循环的次数
 	public static ReentrantLock lock = new ReentrantLock();// 公共锁
 	
 	public static Runnable createRunnable() {
